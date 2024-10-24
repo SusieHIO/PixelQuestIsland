@@ -101,17 +101,17 @@ class Game:
         #self.lives_label = tk.Label(self.window, text=f"Lives: {self.lives}", font=("Arial", 12))
 
         # Label for question and changed color
-        self.question_label = tk.Label(self.window, text="", font=("Arial", 14), fg="white", bg="black")
+        self.question_label = tk.Label(self.window, text="", font=("Arial", 16), fg="white", bg="black")
 
         # Label for instructions and changed color
-        self.instructions_label_top = tk.Label(self.window, text="Click on answers below:", font=("Arial", 12),
+        self.instructions_label_top = tk.Label(self.window, text="Click on answers below:", font=("Arial", 14),
         fg="white", bg="black")
 
         # Option buttons
         self.option_buttons = []
         for i in range(3):
             button = tk.Button(self.window, text="", command=lambda idx=i: self.check_answer(idx),
-                               bg="black", fg="white", font=("Arial", 12, "bold"))
+                               bg="black", fg="white", font=("Arial", 14, "bold"))
             self.option_buttons.append(button)
 
         # Label for error messages
@@ -148,8 +148,6 @@ class Game:
             self.lives_canvas.create_image(0, 0, anchor="nw", image=self.one_heart)
         else:
             self.lives_canvas.create_image(0, 0, anchor="nw", image=self.no_hearts)
-
-        self.lives_canvas.config(bg=self.window['bg'])
 
     def resize_elements(self, event=None):
         # Hvis event er None, bruk vinduets nåværende bredde og høyde
@@ -250,8 +248,8 @@ class Game:
         #self.ask_question()
 
         self.lives_canvas.place(x=10, y=10)  # Update position of lives display
-        self.question_label.place(relx=0.5, rely=0.4, anchor="center")
-        self.instructions_label_top.place(relx=0.5, rely=0.45, anchor="center")
+        self.question_label.place(relx=0.5, rely=0.3, anchor="center")
+        self.instructions_label_top.place(relx=0.5, rely=0.4, anchor="center")
         self.display_question(self.main_questions[self.current_main_question_index])
         self.error_label.place(relx=0.5, rely=0.8, anchor="center")
 

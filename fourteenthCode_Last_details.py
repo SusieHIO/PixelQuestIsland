@@ -49,6 +49,7 @@ class Game:
         self.got_side_question2 = False
 
         self.treasure_chest = None
+        self.pirate_flag = None
 
         # Paths to heart images
         self.all_hearts_path = "assets/All_hearts.png"
@@ -58,7 +59,7 @@ class Game:
 
         # Create main window for tkinter
         self.window = tk.Tk()
-        self.window.title("Pixel Quests Island")
+        self.window.title("Pixel Questions Island")
 
         # Set default window size
         self.window.geometry("800x600")
@@ -83,6 +84,11 @@ class Game:
         self.treasure_image = self.treasure_image.resize((200, 200), Image.LANCZOS)  # Juster størrelsen om nødvendig
         self.treasure_photo = ImageTk.PhotoImage(self.treasure_image)
 
+        # Load and resize the pirate flag image
+        self.pirate_flag_image = Image.open("assets/Pirate_flag.png")  # Change the path to your flag image
+        self.pirate_flag_image = self.pirate_flag_image.resize((300, 300), Image.LANCZOS)  # Adjust size if necessary
+        self.pirate_flag_photo = ImageTk.PhotoImage(self.pirate_flag_image)
+
         # Create a canvas to display the background image
         self.canvas = tk.Canvas(self.window, width=800, height=600)
         self.canvas.pack(fill="both", expand=True)
@@ -91,7 +97,7 @@ class Game:
         self.load_heart_images()
 
         # Create a canvas to display lives
-        self.lives_canvas = tk.Canvas(self.window, width=123, height=45, highlightthickness=0, bg=self.window['bg'])
+        self.lives_canvas = tk.Canvas(self.window, width=123, height=45, highlightthickness=0, bg='#1F6EAD')
         self.lives_canvas.place(x=10, y=10)
         self.update_lives_display()
 
@@ -214,6 +220,15 @@ class Game:
                 # Flytt skattekisten til den nye plasseringen
                 self.canvas.coords(self.treasure_chest, chest_x, chest_y)
 
+            # Oppdater plasseringen av skattekisten hvis den er synlig
+            if self.pirate_flag is not None:  # Sjekk at skattekisten er synlig
+                    # Beregn midtpunktet for bredden og ønsket høyde for skattekisten
+                    flag_x = new_width // 2  # Sørg for at skattekisten plasseres midt i bredden
+                    flag_y = int(new_height * 0.75)  # Plasserer skattekisten nær bunnen av skjermen
+
+                    # Flytt skattekisten til den nye plasseringen
+                    self.canvas.coords(self.pirate_flag, flag_x, flag_y)
+
     def show_start_screen(self):
         # Fjern elementer fra eventuelle tidligere skjermer og vis startskjermen
         self.canvas.delete("all")
@@ -223,6 +238,9 @@ class Game:
         for button in self.option_buttons:
             button.pack_forget()
         self.error_label.pack_forget()
+
+        # Skjul hjertene
+        self.lives_canvas.place_forget()
 
         # Vis startskjermens bakgrunnsbilde og logo
         self.background = self.canvas.create_image(0, 0, anchor="nw", image=self.bg_photo)
@@ -253,15 +271,8 @@ class Game:
         self.background = self.canvas.create_image(0, 0, anchor="nw", image=self.question_bg_photo)
         self.background_image = 'question'  # Markere at vi er på spørsmåls-skjermen
 
-        #self.lives = 3  # Reset lives when starting the game
-        #self.current_main_question_index = 0
-        #self.current_side_question1_index = 0
-        #self.current_side_question2_index = 0
-        #self.is_main_question = True
-        #self.got_side_question1 = False
-        #self.got_side_question2 = False
-        #self.lives_label.config(text=f"Lives: {self.lives}")  # Update lives label
-        #self.ask_question()
+        # Vis hjertene på spørsmåls-skjermen
+        self.lives_canvas.place(x=10, y=10)
 
         self.lives_canvas.place(x=10, y=10)  # Update position of lives display
         self.question_label.place(relx=0.5, rely=0.3, anchor="center")
@@ -376,9 +387,9 @@ class Game:
         self.show_end_screen("Congratulations! You won and found the Treasure!", show_treasure=True)
 
     def lose_game(self):
-        self.show_end_screen("Game Over!")
+        self.show_end_screen("Game Over! \n The Pirates Got The Treasure!", show_flag=True)
 
-    def show_end_screen(self, message, show_treasure=False):
+    def show_end_screen(self, message, show_treasure=False, show_flag=False):
         # Fjern spørsmålselementene og vis sluttmeldingen
         self.question_label.config(text=message)
         self.instructions_label_top.place_forget()
@@ -401,6 +412,19 @@ class Game:
 
             # Plasser skattekisten og hold på referansen
             self.treasure_chest = self.canvas.create_image(chest_x, chest_y, anchor="center", image=self.treasure_photo)
+
+        if self.pirate_flag is not None:
+            self.canvas.delete(self.pirate_flag)
+
+        # Hvis spilleren taper, vis piratflagget
+        if show_flag:
+            window_width = self.window.winfo_width()
+            window_height = self.window.winfo_height()
+
+            flag_x = window_width // 2  # Bruk window_width for å sikre at flagget plasseres midtstilt
+            flag_y = int(window_height * 0.75)
+
+            self.pirate_flag = self.canvas.create_image(flag_x, flag_y, anchor="center", image=self.pirate_flag_photo)
 
         # Lag "Try Again"- og "Quit"-knapper
         try_again_button = tk.Button(self.window, text="Try Again", command=self.restart_game, bg="black", fg="white",
